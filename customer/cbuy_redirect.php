@@ -76,12 +76,25 @@ if (isset($_POST['add_to_cart'])) {
 }
 
 // Handle item removal
+// if (isset($_GET['action']) && $_GET['action'] == 'delete' && !empty($_GET['id'])) {
+//     $id = $_GET['id'];  // No (int) casting to prevent 0 issues
+
+//     if (isset($_SESSION["shopping_cart"])) {
+//         foreach ($_SESSION["shopping_cart"] as $keys => $values) {
+//             if (isset($values["item_id"]) && $values["item_id"] == $id) {
+//                 unset($_SESSION["shopping_cart"][$keys]);
+//                 $_SESSION["shopping_cart"] = array_values($_SESSION["shopping_cart"]); // Reset array index
+//                 break;
+//             }
+//         }
+//     }
+// Handle item removal
 if (isset($_GET['action']) && $_GET['action'] == 'delete' && !empty($_GET['id'])) {
     $id = $_GET['id'];  // No (int) casting to prevent 0 issues
 
     if (isset($_SESSION["shopping_cart"])) {
         foreach ($_SESSION["shopping_cart"] as $keys => $values) {
-            if (isset($values["item_id"]) && $values["item_id"] == $id) {
+            if (isset($values["item_name"]) && $values["item_name"] == $id) {
                 unset($_SESSION["shopping_cart"][$keys]);
                 $_SESSION["shopping_cart"] = array_values($_SESSION["shopping_cart"]); // Reset array index
                 break;
@@ -89,15 +102,31 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && !empty($_GET['id'])
         }
     }
 
-    // Remove from database cart table if trade_id exists
-    $stmt = $conn->prepare("DELETE FROM cart WHERE trade_id = ? OR cropname = ?");
-    $stmt->bind_param("is", $id, $id);
+    // Remove from database cart table
+    $stmt = $conn->prepare("DELETE FROM cart WHERE cropname = ?");
+    $stmt->bind_param("s", $id);
     $stmt->execute();
     $stmt->close();
 
     header("Location: cbuy_crops.php");
     exit();
-}
+} // <-- Closing bracket was missing here
+
+
+
+    // Remove from database cart table if trade_id exists
+    // $stmt = $conn->prepare("DELETE FROM cart WHERE trade_id = ? OR cropname = ?");
+    // $stmt->bind_param("is", $id, $id);
+//     $stmt = $conn->prepare("DELETE FROM cart WHERE cropname = ?");
+//     $stmt->bind_param("s", $id);
+
+
+//     $stmt->execute();
+//     $stmt->close();
+
+//     header("Location: cbuy_crops.php");
+//     exit();
+// }
 
 
 ?>

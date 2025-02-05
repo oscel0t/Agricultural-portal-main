@@ -21,9 +21,12 @@ if(isset($_GET["action"]) && $_GET["action"] == "delete" && isset($_GET["id"])) 
             $_SESSION["shopping_cart"] = array_values($_SESSION["shopping_cart"]);
 
             // Ensure correct column name
-            $delete_query = "DELETE FROM cart WHERE id = ?"; // Assuming 'id' is the correct column
-            $stmt = $conn->prepare($delete_query);
-            $stmt->bind_param("i", $item_id);
+            $delete_query = "DELETE FROM cart WHERE cropname = ?";
+$stmt = $conn->prepare($delete_query);
+$stmt->bind_param("s", $item_name);
+ // Assuming 'id' is the correct column
+            // $stmt = $conn->prepare($delete_query);
+            // $stmt->bind_param("i", $item_id);
             $stmt->execute();
 
             // Recalculate total
@@ -134,11 +137,12 @@ $para2 = $row4['cust_name'];
                                 <td><?php echo $values["item_quantity"]; ?> KG</td>
                                 <td>₹<?php echo number_format($values["item_price"], 2); ?></td>
                                 <td>
-                                <a href="cbuy_redirect.php?action=delete&id=<?php echo isset($values['item_id']) ? $values['item_id'] : ''; ?>" 
-   class="btn btn-warning btn-sm remove-btn" 
-   onclick="return confirm('Remove this item from cart?');">
-   Remove
+                                <a href="cbuy_redirect.php?action=delete&id=<?php echo !empty($values['item_name']) ? urlencode($values['item_name']) : ''; ?>" 
+class="btn btn-warning btn-sm remove-btn" 
+onclick="return confirm('Remove this item from cart?');">
+Remove
 </a>
+
 
                                 </td>
                             </tr>
