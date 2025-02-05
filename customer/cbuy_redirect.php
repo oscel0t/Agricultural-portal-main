@@ -30,15 +30,18 @@ if (isset($_POST['add_to_cart'])) {
             }
         }
     }
+    // After adding the item to the cart in cbuy_redirect.php
+if (!$item_exists) {
+    $item_array = array(
+        'item_name' => $crop,
+        'item_quantity' => $quantity,
+        'item_price' => $price
+    );
+    $_SESSION["shopping_cart"][] = $item_array;
+}
 
-    if (!$item_exists) {
-        $item_array = array(
-            'item_name' => $crop,
-            'item_quantity' => $quantity,
-            'item_price' => $price
-        );
-        $_SESSION["shopping_cart"][] = $item_array;
-    }
+// Recalculate total after adding item
+$_SESSION['Total_Cart_Price'] = array_sum(array_column($_SESSION["shopping_cart"], 'item_price'));
 
     // Check if cart table has 'trade_id' column
     $result = $conn->query("SHOW COLUMNS FROM cart LIKE 'trade_id'");

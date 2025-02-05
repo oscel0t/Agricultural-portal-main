@@ -9,30 +9,28 @@ if(!isset($_SESSION['customer_login_user'])){
 }
 
 // Handle item removal
-if(isset($_GET["action"]) && $_GET["action"] == "delete" && isset($_GET["id"])) {
-    $item_id = (int)$_GET["id"];
+// In cbuy.php, handle removal by item name
+if (isset($_GET["action"]) && $_GET["action"] == "delete" && isset($_GET["id"])) {
+    $item_name = $_GET["id"];
     
-    if(!empty($_SESSION["shopping_cart"])) {
-        $item_index = array_search($item_id, array_column($_SESSION["shopping_cart"], 'item_id'));
-        
-        if($item_index !== false) {
-            // Remove from session
-            unset($_SESSION["shopping_cart"][$item_index]);
-            $_SESSION["shopping_cart"] = array_values($_SESSION["shopping_cart"]);
-
-            // Ensure correct column name
-            $delete_query = "DELETE FROM cart WHERE cropname = ?";
-$stmt = $conn->prepare($delete_query);
-$stmt->bind_param("s", $item_name);
- // Assuming 'id' is the correct column
-            // $stmt = $conn->prepare($delete_query);
-            // $stmt->bind_param("i", $item_id);
-            $stmt->execute();
-
-            // Recalculate total
-            $_SESSION['Total_Cart_Price'] = array_sum(array_column($_SESSION["shopping_cart"], 'item_price'));
+    if (!empty($_SESSION["shopping_cart"])) {
+        foreach ($_SESSION["shopping_cart"] as $keys => $values) {
+            if ($values["item_name"] == $item_name) {
+                unset($_SESSION["shopping_cart"][$keys]);
+                $_SESSION["shopping_cart"] = array_values($_SESSION["shopping_cart"]);
+                break;
+            }
         }
+        // Recalculate total
+        $_SESSION['Total_Cart_Price'] = array_sum(array_column($_SESSION["shopping_cart"], 'item_price'));
     }
+    
+    // Delete from database
+    $delete_query = "DELETE FROM cart WHERE cropname = ?";
+    $stmt = $conn->prepare($delete_query);
+    $stmt->bind_param("s", $item_name);
+    $stmt->execute();
+    
     header("Location: cbuy_crops.php");
     exit();
 }

@@ -7,12 +7,23 @@ if (!isset($_SESSION['customer_login_user'])) {
     header("Location: ../login.php");
     exit();
 }
+// In StripeIPN.php
+// Get total from session or recalculate
+if (!isset($_SESSION['Total_Cart_Price'])) {
+    $_SESSION['Total_Cart_Price'] = array_sum(array_column($_SESSION["shopping_cart"], 'item_price'));
+}
+$totalCartPrice = $_SESSION['Total_Cart_Price'];
+$totalAmount = $totalCartPrice * 100;
 
+// Add minimum order check (if needed)
+if ($totalCartPrice < 50) { // ₹50 minimum
+    die("Error: Minimum order amount is ₹50. Please add more items.");
+}
 // Ensure cart total is available
-$totalCartPrice = isset($_SESSION['Total_Cart_Price']) ? $_SESSION['Total_Cart_Price'] : 0;
+// $totalCartPrice = isset($_SESSION['Total_Cart_Price']) ? $_SESSION['Total_Cart_Price'] : 0;
 
-// Convert price to paise (Stripe requires amount in the smallest currency unit)
-$totalAmount = $totalCartPrice * 100; 
+// // Convert price to paise (Stripe requires amount in the smallest currency unit)
+// $totalAmount = $totalCartPrice * 100; 
 
 if ($totalAmount <= 0) {
     die("Error: Invalid cart total. Please add items to your cart.");
